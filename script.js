@@ -168,3 +168,37 @@ fillIcons('skills-icons', [
     'fa-solid fa-desktop',
     'fa-solid fa-laptop'
 ], 20);
+const contactForm = document.getElementById('contactForm');
+const formStatus = document.getElementById('formStatus');
+
+contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('nameInput').value;
+    const email = document.getElementById('emailInput').value;
+    const message = document.getElementById('messageInput').value;
+
+    formStatus.textContent = "Sending...";
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/submit-contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, message })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            formStatus.textContent = "Message sent successfully! ✅";
+            formStatus.style.color = "lightgreen";
+            contactForm.reset();
+        } else {
+            formStatus.textContent = "Error: " + result.error;
+            formStatus.style.color = "red";
+        }
+    } catch (error) {
+        formStatus.textContent = "Could not connect to server. Is Flask running?";
+        formStatus.style.color = "red";
+    }
+});
